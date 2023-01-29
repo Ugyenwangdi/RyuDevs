@@ -1,0 +1,4887 @@
+Project name: RyuDevs
+
+Ryu: Dragon, Land of thunder dragon 
+Online directory to store Bhutanese developer's profiles.
+
+online platform where developers can create a profile and share their work with others.
+
+
+
+
+Features
+
+    Share Projects
+    Message other developers
+    Rate others work
+    Search other developers
+
+Course Overview
+
+    Basic Djagno Overview
+    Database Design and Models
+    Static Files
+    User Registration & Authenticaiton
+    Search
+    Pagination
+    Building an API with Django REST Framework (DRF)
+    Deployment
+
+Tech Stack
+
+    Django
+    Postgres
+    Django REST Framework
+    Render 
+    Cloudinary : wulfc
+
+#### TODO ####
+## Future: Country validation https://rapidapi.com/wirefreethought/api/geodb-cities
+
+    Country code: BT 
+
+
+- Companies using Django: pinterest, dropbox, instagram, spotify, udemy, youtube
+
+- Building APIs with Django makes easy: Django REST frameworks
+
+- Other frameworks: Flask, Cherry Pie, Web2py, Pyramid
+
+- MVT Design pattern of Django: 
+        Model: data acess layer
+        Template: Presentation layer
+        View: Business Logic (Functions in the backend)
+
+
+1/ create a virtual environment and activate
+
+    $ pip install virtualenv
+
+    $ virtualenv env
+
+    $ env\scripts\activate
+
+2/ Installation: Create project
+    $ pip install django 
+
+    $ django-admin 
+
+    $ django-admin startproject ryudevs
+
+    $ cd ryudevs
+
+    $ python manage.py runserver
+
+
+    * Django apps run inside the project which are the actual functionality, or main functions running 
+
+3/ Create app inside project
+
+    $ python manage.py startapp projects
+
+4/ Inside the settings.py add the following INSTALLED_APPS list
+
+'projects.apps.ProjectsConfig',
+
+* 5/ Views and urls : paths for certain functions and returns some templates 
+
+Eg of paths and views inside the urls file
+
+'''
+
+from django.contrib import admin
+from django.urls import path
+from django.http import HttpResponse
+
+def projects(request):
+    return HttpResponse('Here are our projects')
+
+
+def project(request, pk):
+    return HttpResponse('Here are our projects' + ' ' + pk)
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('projects/', projects, name='Projects'),
+    path('project/<str:pk>/', project, name='Project'),
+]
+
+'''
+
+6/ Since we will have multiple apps with multiple lines of codes and functions, we might separate them and let views take care of it 
+
+- Copy the above code inside the projects/views
+
+7/ We will also separate urls by creating urls.py inside the projects folder and add the urls as below
+
+'''
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('projects/', views.projects, name='Projects'),
+    path('project/<str:pk>/', views.project, name='Project'),
+]
+
+'''
+
+8/ include urls inside the ryudevs.urls
+
+'''
+from django.urls import path, include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('', include('projects.urls'))
+]
+
+'''
+
+* 9/ Templates and template inheritance
+
+- Create a folder called templates inside the the folder where the manage.py is 
+- Create two html files for projects and single project 
+
+10/ We will now let django know where to find this:
+
+- inside the settings.py 
+
+'''
+
+import os 
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),
+        ],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+'''
+
+11/ Inside the views of projects directory we will render the templates 
+
+'''
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def projects(request):
+    return render(request, 'projects.html')
+
+
+def project(request, pk):
+    return render(request, 'single-project.html')
+
+
+'''
+
+
+12/ Including template from another template: templates 
+
+- Create a navbar.html file inside the templates folder 
+- To include it inside let's say, projects.html, 
+
+Inside projects.html:
+
+'''
+{% include 'navbar.html' %}
+
+<h1>Projects Template</h1>
+<p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sem viverra aliquet eget sit. Sit amet mauris commodo quis imperdiet massa tincidunt nunc. Nunc vel risus commodo viverra maecenas accumsan lacus. Integer quis auctor elit sed vulputate mi sit. 
+    Eu feugiat pretium nibh ipsum. Amet risus nullam eget felis. Nascetur ridiculus mus mauris vitae ultricies leo integer. Integer malesuada nunc vel risus. Dui nunc mattis enim ut.
+</p>
+
+'''
+
+13/ We will create a main file called main.html and use that theme for almost every other page by modifying it or styling main theme 
+
+'''
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RyuDevs</title>
+</head>
+<body>
+    <h1>This is the main template </h1>
+    
+    {% include 'navbar.html' %}
+
+    {% block content %} 
+
+    {% endblock content %}
+</body> 
+</html>
+
+'''
+
+- Extend this template in projects.html 
+
+'''
+{% extends 'main.html' %}
+{% block content %}
+
+<h1>Projects Template</h1>
+<p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sem viverra aliquet eget sit. Sit amet mauris commodo quis imperdiet massa tincidunt nunc. Nunc vel risus commodo viverra maecenas accumsan lacus. Integer quis auctor elit sed vulputate mi sit. 
+    Eu feugiat pretium nibh ipsum. Amet risus nullam eget felis. Nascetur ridiculus mus mauris vitae ultricies leo integer. Integer malesuada nunc vel risus. Dui nunc mattis enim ut.
+</p>
+
+
+{% endblock content %}
+
+'''
+
+- Extend this template in single-project.html 
+
+14/ Although this way of specifying the templates if correct way, we are going to work with seperate apps and therefore we will separate those templates for each app by
+creating a templates folder inside the app folder (projects). To do this 
+
+- Create a folder called 'templates' inside the projects and inside it create again a 'projects' folder. So this way we need not add path inside the settings
+
+- Cut projects.html and single-project.html and paste inside the newly created projects folder inside templates 
+
+- main.html and navbar.html will reside inside the original templates folder since it will be used across multiple apps 
+
+- so to access the templates, we need to specify the folder name as below in views 
+
+'''
+
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def projects(request):
+    return render(request, 'projects/projects.html')
+
+
+def project(request, pk):
+    return render(request, 'projects/single-project.html')
+
+
+'''
+
+* 15/ Rendering data to templates : making contents dynamic
+
+- Template variables {{ variable }}, {{ object.attribute }}
+- Tags: allows python type syntax {% if user.is_authenticated %} {% endif %}
+
+
+- Inside the views.py: 
+
+'''
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def projects(request):
+    page = 'Projects'
+    return render(request, 'projects/projects.html', {'page': page})
+
+
+def project(request, pk):
+    return render(request, 'projects/single-project.html')
+
+'''
+
+- inside projects.html
+
+'''
+{% extends 'main.html' %}
+{% block content %}
+
+<p>Hello, you are on the {{ page }} page</p>
+<h1>Projects Template</h1>
+<p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sem viverra aliquet eget sit. Sit amet mauris commodo quis imperdiet massa tincidunt nunc. Nunc vel risus commodo viverra maecenas accumsan lacus. Integer quis auctor elit sed vulputate mi sit. 
+    Eu feugiat pretium nibh ipsum. Amet risus nullam eget felis. Nascetur ridiculus mus mauris vitae ultricies leo integer. Integer malesuada nunc vel risus. Dui nunc mattis enim ut.
+</p>
+
+
+{% endblock content %}
+'''
+
+- Conditions: 
+
+'''
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def projects(request):
+    page = 'Projects'
+    number = 10 
+    context = {'page': page, 'number': number}
+    return render(request, 'projects/projects.html', context)
+
+
+def project(request, pk):
+    return render(request, 'projects/single-project.html')
+
+'''
+
+'''
+{% extends 'main.html' %}
+{% block content %}
+
+<p>Hello, you are on the {{ page }} page</p>
+
+{% if number > 10 %}
+    <p>Number is greater than 10</p>
+
+{% elif number == 10 %}
+    <p>Number is exactly 10</p>
+
+{% else %}
+    <p>Number is less than 10</p>
+
+{% endif %}
+
+<h1>Projects Template</h1>
+<p>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sem viverra aliquet eget sit. Sit amet mauris commodo quis imperdiet massa tincidunt nunc. Nunc vel risus commodo viverra maecenas accumsan lacus. Integer quis auctor elit sed vulputate mi sit. 
+    Eu feugiat pretium nibh ipsum. Amet risus nullam eget felis. Nascetur ridiculus mus mauris vitae ultricies leo integer. Integer malesuada nunc vel risus. Dui nunc mattis enim ut.
+</p>
+
+
+{% endblock content %}
+'''
+
+16/ Access urls dynamically 
+
+- views.py
+'''
+def project(request, pk):
+    projectObj = None 
+    
+    for i in projectsList:
+        if i['id'] == pk:
+            projectObj = i 
+
+    return render(request, 'projects/single-project.html', {'project': projectObj})
+
+'''
+
+- projects.html
+'''
+<ul>
+    {% for project in projects %}
+        <li>Title: <a href="{% url 'project' project.id %}">{{project.title}}</a> --- {{project.description}}</li>
+    {% endfor %}
+</ul>
+
+
+'''
+
+- We have urls, since we use name, the paths doesn't affect 
+
+'''
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.projects, name='projects'),
+    path('project/<str:pk>/', views.project, name='project'),
+]
+
+
+'''
+
+17/ Models and admin panel 
+
+    $ python manage.py migrate 
+
+    $ python manage.py createsuperuser
+
+    wulfi.uGE
+
+Models: classes that creates tables
+
+null: means the database to be empty or not
+blank: means when submitting the form to be empty or not
+
+- Inside models.py of projects: create Project model 
+
+'''
+from django.db import models
+import uuid
+# Create your models here.
+
+class Project(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    demo_link = models.CharField(max_length=2000, null=True, blank=True)
+    source_link = models.CharField(max_length=2000, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return self.title 
+
+'''
+
+$ python manage.py makemigrations
+$ python manage.py migrate
+
+- Table just created but we now need to register the table so that it will be shown in admin panel
+
+Inside the admin.py 
+
+'''
+from django.contrib import admin
+from .models import Project
+
+admin.site.register(Project)
+'''
+
+18/ Database relationship
+
+one-to-one: one table record can relate to one record in another table --- eg. one user can have one profile and one profile can only have one user 
+one-to-many: one table record can relate to many records in another table --- eg. one profile can have multiple Projects
+many-to-many: multiple records in a table are associated with multiple records in another table
+
+
+* Django automatically creates the intermediary table for Many-to-many relationships
+
+RyuDevs database relationships:
+https://drawsql.app/teams/wulfi/diagrams/ryudevs
+
+
+- To create relationships between models : below the CASCADE will delete all the values of review associated with project
+
+'''
+from django.db import models
+import uuid
+# Create your models here.
+
+class Project(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    demo_link = models.CharField(max_length=2000, null=True, blank=True)
+    source_link = models.CharField(max_length=2000, null=True, blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
+    vote_total = models.IntegerField(default=0, null=True, blank=True)
+    vote_ratio = models.IntegerField(default=0, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return self.title 
+
+class Review(models.Model):
+    VOTE_TYPE = (
+        ('up', 'Up Vote'),
+        ('down', 'Down Vote'),
+    )
+    # owner = 
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    body = models.TextField(blank=True, null=True)
+    value = models.CharField(max_length=200, choices=VOTE_TYPE)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.value
+
+class Tag(models.Model):
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.name
+    '''
+
+    
+- makemigrations and migrate
+
+- register them in admin panel 
+
+19/ Database Queries: 
+
+- queryset = ModelName.objects.all()
+- .............................get()
+- .............................filter()
+- .............................exclude()
+
+
+    $ python manage.py shell
+
+    >>> from projects.models import Project 
+    >>> projects = Project.objects.all()
+    >>> projectObj = Project.objects.get(title='Portfolio website')
+    >>> print(projectObj)
+    >>> print(projectObj.title) \
+    >>> projects = Project.objects.filter(title__startswith='po')
+    >>> projects = Project.objects.filter(vote_ratio__gte=50) 
+    >>> projects = Project.objects.filter(vote_ratio__lte=50) 
+
+- One-to-many: Query models children : Let's say we want to query all the reviews of Ecommerce website we can query child model 
+
+    * child model has to be small cased even though it's actual model is capitalised 
+
+    >>> item = ModelName.object.first()
+    >>> item.childmodel_set.all()
+
+
+    >>> project = Project.objects.get(title='Ecommerce website')
+    >>> print(project.review_set.all())
+
+
+- many-to-many: Query fields 
+
+    >>> item = ModelName.object.first()
+    >>> item.relationshipname.all()
+
+    >>> project = Project.objects.get(title='Ecommerce website')
+    >>> print(project.tags.all()) 
+
+
+
+Inside views :
+
+'''
+from .models import Project
+
+def projects(request):
+    projects = Project.objects.all()
+    context = {'projects': projects}
+    return render(request, 'projects/projects.html', context)
+
+
+def project(request, pk):
+    projectObj = Project.objects.get(id=pk)
+    print({'projectObj': projectObj})
+    return render(request, 'projects/single-project.html', {'projectObj': projectObj})
+
+
+'''
+
+Inside single-project.html
+
+'''
+{% extends 'main.html' %}
+{% block content %}
+<h1>{{project.title}}</h1>
+<hr>
+{% for tag in project.tags.all %}
+    <span style="border: 1px solid grey;">{{tag}}</span>
+{% endfor %}
+<hr>
+<br>
+
+<p>{{projectObj.description}}</p>
+
+<br>
+
+{% endblock content %}
+'''
+
+20/ Django Model forms : Way to create a form based on particular Model rather than hand coding 
+
+- Inside the templates folder inside theh projects, create a new file project_form.html
+
+'''
+
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Project Form</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <input type="submit">
+</form>
+
+{% endblock content %}
+
+'''
+
+
+- inside views:
+
+'''
+def createProject(request):
+    context = {}
+    return render(request, 'projects/project_form.html', context)
+
+    '''
+
+- inside urls:
+
+'''
+    path('create-project/', views.createProject, name='create-project'),
+
+''
+
+- Go into main templates folder inside the navbar.html 
+
+'''
+<h1>Logo</h1> 
+<a href="{% url 'create-project' %}">Add Project</a>
+<hr>
+
+'''
+
+- Inside the projects folder, create a file called forms.py 
+
+'''
+from django.forms import ModelForm
+from .models import Project
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project 
+        field = '__all__'
+'''
+ 
+- To use this, import in views 
+
+'''
+def createProject(request):
+    form = ProjectForm()
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+
+'''
+
+- Go to project_form.html
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Project Form</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{form}}
+    <input type="submit">
+</form>
+
+{% endblock content %}
+'''
+
+OR 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Project Form</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{form.title}}
+    <input type="submit">
+</form>
+
+{% endblock content %}
+'''
+
+OR 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Project Form</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+    {{field.label}}
+    {{field}}
+    {% endfor %}
+    <input type="submit">
+</form>
+
+{% endblock content %}
+'''
+
+OR 
+
+'''
+
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Project Form</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit">
+</form>
+
+{% endblock content %}
+
+'''
+
+21/ CRUD 
+
+- Create, Update 
+
+Inside views
+
+'''
+
+def createProject(request):
+    form = ProjectForm()
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('projects')
+
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+
+def updateProject(request, pk):
+    project = Project.objects.get(id=pk)
+    form = ProjectForm(instance=project)
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return redirect('projects')
+            
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+    '''
+
+- Inside urls 
+
+'''
+
+    path('update-project/<str:pk>/', views.updateProject, name='update-project'),
+
+'''
+
+- Inside projects.html 
+
+'''
+
+{% extends 'main.html' %}
+{% block content %}
+
+
+<h1>Projects</h1>
+
+<table>
+    <tr>
+        <th>Project</th>
+        <th>Positive Votes</th>
+        <th>Votes</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    {% for project in projects %}
+
+        <tr>
+            <td>{{project.title}}</td>
+            <td>{{project.vote_ratio}}%</td>
+            <td>{{project.vote_total}}</td>
+            <td>{{project.created}}</td>
+            <td><a href="{% url 'update-project' project.id %}">Edit</a></td>
+            <td><a href="{% url 'project' project.id %}">View</a></td>
+        </tr>
+    {% endfor %}
+</table>
+
+'''
+
+
+- Delete 
+
+
+
+- Inside projects.html 
+
+'''
+
+{% extends 'main.html' %}
+{% block content %}
+
+
+<h1>Projects</h1>
+
+<table>
+    <tr>
+        <th>Project</th>
+        <th>Positive Votes</th>
+        <th>Votes</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    {% for project in projects %}
+
+        <tr>
+            <td>{{project.title}}</td>
+            <td>{{project.vote_ratio}}%</td>
+            <td>{{project.vote_total}}</td>
+            <td>{{project.created}}</td>
+            <td><a href="{% url 'update-project' project.id %}">Edit</a></td>
+            <td><a href="">Delete</a></td>
+            <td><a href="{% url 'project' project.id %}">View</a></td>
+        </tr>
+    {% endfor %}
+</table>
+
+'''
+
+- Inside projects template, create a new file for confimation 
+
+
+delete_template.html
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <p>Are you sure you want to delete "{{object}}"?</p>
+    
+    <a href="{% url 'projects' %}">Go Back</a>
+    <input type="submit" value="Confirm"/>
+</form>
+
+{% endblock content %}
+'''
+
+- Inside the views 
+
+'''
+
+
+def deleteProject(request, pk):
+    project = Project.objects.get(id=pk)
+    if request.method == 'POST':
+        project.delete()
+        return redirect('projects')
+
+    context = {'object': project}
+    return render(request, 'projects/delete_template.html', context)
+'''
+
+- Create url 
+
+'''
+    path('delete-project/<str:pk>/', views.deleteProject, name='delete-project'),
+
+'''
+
+
+- Inside the projects.html
+'''
+{% extends 'main.html' %}
+{% block content %}
+
+
+<h1>Projects</h1>
+
+<table>
+    <tr>
+        <th>Project</th>
+        <th>Positive Votes</th>
+        <th>Votes</th>
+        <th></th>
+        <th></th>
+    </tr>
+
+    {% for project in projects %}
+
+        <tr>
+            <td>{{project.title}}</td>
+            <td>{{project.vote_ratio}}%</td>
+            <td>{{project.vote_total}}</td>
+            <td>{{project.created}}</td>
+            <td><a href="{% url 'update-project' project.id %}">Edit</a></td>
+            <td><a href="{% url 'delete-project' project.id %}">Delete</a></td>
+            <td><a href="{% url 'project' project.id %}">View</a></td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock content %}
+'''
+
+
+22/ Static files 
+
+- Create static folder inside the project folder where manage.py is located 
+- create three folders in it, images, styles, js 
+- inside styles, create a css file main.css 
+
+'''
+h1{
+    color: redS;
+}
+
+p{
+    color: blue;
+}
+
+'''
+
+- configure static files in settings 
+
+'''
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+'''
+
+
+- in the main.html, link the main.css file 
+
+'''
+
+<link rel="stylesheet" type="text/css" media="screen" href="{% static 'styles/main.css' %}">
+'''
+
+
+- User uploaded images : 
+
+Inside the models.py, add image attibute in Project 
+
+'''
+    featured_image = models.ImageField(null=True, blank=True, default='default.jpg')
+'''
+
+- We need Pillow when we want to upload Images in models 
+
+    $ python -m pip install pillow
+    $ python manage.py makemigrations
+    $ python manage.py migrate
+
+- Set up MEDIA_ROOT, where to upload user generated content fields 
+
+'''
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+'''
+
+- So to render the uploaded pictures: go to single_project.html
+'''
+{% extends 'main.html' %}
+{% block content %}
+
+<img src="{{ project.featured_image.url }}" alt="">
+<h1>{{project.title}}</h1>
+<hr>
+{% for tag in project.tags.all %}
+    <span style="border: 1px solid grey;">{{tag}}</span>
+{% endfor %}
+<hr>
+<br>
+
+<p>{{project.description}}</p>
+
+<br>
+
+{% endblock content %}
+'''
+
+- Set the url for uploaded images inside settings 
+
+'''
+MEDIA_URL = '/images/'
+'''
+
+- inside the main urls.py in ryudevs folder 
+
+'''
+from django.contrib import admin
+from django.urls import path, include
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('', include('projects.urls'))
+]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+'''
+
+- We want to allow users to upload their images
+
+Inside forms.py , add a new field featured_image
+
+'''
+            fields = ['title', 'featured_image', 'description', 'demo_link', 'source_link', 'tags']
+'''
+
+- Go to project_form.html 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Project Form</h1>
+
+<form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock content %}
+
+'''
+
+- go into our views edit the form as below, add request.FILES 
+
+'''
+
+def createProject(request):
+    form = ProjectForm()
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('projects')
+
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+def updateProject(request, pk):
+    project = Project.objects.get(id=pk)
+    form = ProjectForm(instance=project)
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES, instance=project)
+        if form.is_valid():
+            form.save()
+            return redirect('projects')
+            
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+'''
+
+- Serving static files while in production is different from development mode 
+ We can use third party library called whitenoise 
+
+Inside settings, so STATIC_ROOT will tell where to store the static files in production 
+
+'''
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+'''
+
+$ python manage.py collectstatic
+
+- ALLOWED_HOSTS must be set up when debug is False 
+
+- Set urls for static files in production inside the main urls 
+
+'''
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+'''
+
+$ python -m pip install whitenoise 
+
+Add it inside MIDDLEWARE
+
+'''
+"whitenoise.middleware.WhiteNoiseMiddleware",
+
+'''
+
+- Still we have the problem with whitenoise, it will not serve user uploaded content 
+
+
+
+23/ Installation of theme 
+
+- Copy the uikit folder into the static, app styles into styles
+
+- Pluralize the vote counts (1 vote, 2 votes )
+
+'''
+Feedback ({{project.vote_total}} Vote{{project.vote_total|pluralize:"s"}})
+'''
+
+- We can modify model forms using widgets : inside forms.py
+
+'''
+from django.forms import ModelForm
+from django import forms 
+from .models import Project
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project 
+        fields = ['title', 'featured_image', 'description', 
+                    'demo_link', 'source_link', 'tags']
+        widgets = {
+            'tags': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectForm, self).__init__(*args, **kwargs)
+
+        self.fields['title'].widget.attrs.update({'class':'input'})
+'''
+
+
+24/ Users app 
+
+- Create a new app 
+
+$ python manage.py startapp users
+
+- Register in settings 
+
+'''
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    
+    'projects.apps.ProjectsConfig',
+    'users.apps.UserConfig',
+]
+
+'''
+
+- Inside users app, create a templates/users folder and profiles.html inside it 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+    <h1>User profiles</h1>
+{% endblock content%}
+'''
+
+- Create views 
+
+'''
+from django.shortcuts import render
+
+# Create your views here.
+
+def profiles(request):
+    return render(request, 'users/profiles.html')
+
+    '''
+
+- Connect and create urls, create new file inside users urls.py 
+
+'''
+from django.urls import path 
+from . import views 
+
+urlpatterns = [
+    path('', views.profiles, name='profiles'),
+]
+'''
+
+- Go to root directory urls.py and include user.urls 
+
+'''
+ path('users/', include('users.urls')),
+
+'''
+
+- Create a profiles model inside users.models 
+
+'''
+from django.db import models
+from django.contrib.auth.models import User
+import uuid
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=500, blank=True, null=True)
+    username = models.CharField(max_length=200, blank=True, null=True)
+    short_intro = models.CharField(max_length=200, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True, upload_to='profiles/', default='profiles/user-default.png')
+    social_github = models.CharField(max_length=200, blank=True, null=True)
+    social_twitter = models.CharField(max_length=200, blank=True, null=True)
+    social_linkedin = models.CharField(max_length=200, blank=True, null=True)
+    social_youtube = models.CharField(max_length=200, blank=True, null=True)
+    social_website = models.CharField(max_length=200, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.user.username)
+'''
+
+- register in admin 
+
+- Also add project owner in projects.models for Project model 
+
+'''
+from users.models import Profile
+
+class Project(models.Model):
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
+'''
+
+25/ add and render Profiles 
+
+inside profiles.html of users template 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="home">
+    <section class="hero-section text-center">
+        <div class="container container--narrow">
+        <div class="hero-section__box">
+            <h2>CONNECT WITH <span>DEVELOPERS</span></h2>
+            <h2>FROM AROUND THE WORLD</h2>
+        </div>
+
+        <div class="hero-section__search">
+            <form class="form" action="#" method="get">
+            <div class="form__field">
+                <label for="formInput#search">Search Developers </label>
+                <input class="input input--text" id="formInput#search" type="text" name="text"
+                placeholder="Search by developer name" />
+            </div>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+            </form>
+        </div>
+        </div>
+    </section>
+    <!-- Search Result: DevList -->
+    <section class="devlist">
+        <div class="container">
+        <div class="grid grid--three">
+
+            {% for profile in profiles %}
+            <div class="column card">
+            <div class="dev">
+                <a href="" class="card__body">
+                <div class="dev__profile">
+                    <img class="avatar avatar--md" src="{{ profile.profile_image.url }}" alt="image" />
+                    <div class="dev__meta">
+                    <h3>{{profile.name}}</h3>
+                    <h5>{{profile.short_intro|slice:"60"}}</h5>
+                    </div>
+                </div>
+                <p class="dev__info">{{profile.bio|slice:"150"}}</p>
+                <div class="dev__skills">
+                    <span class="tag tag--pill tag--main">
+                    <small>JavaScript</small>
+                    </span>
+                    <span class="tag tag--pill tag--main">
+                    <small>React</small>
+                    </span>
+                    <span class="tag tag--pill tag--main">
+                    <small>SCSS</small>
+                    </span>
+                    <span class="tag tag--pill tag--main">
+                    <small>Nodejs</small>
+                    </span>
+                    <span class="tag tag--pill tag--main">
+                    <small>Express</small>
+                    </span>
+                    <span class="tag tag--pill tag--main">
+                    <small>GraphQL</small>
+                    </span>
+                </div>
+                </a>
+            </div>
+            </div>
+            {% endfor %}
+    
+        
+        </div>
+        </div>
+    </section>
+
+</main>
+
+{% endblock content%}
+
+'''
+
+25/ Create Skills model 
+ 
+ - inside users.models 
+
+ '''
+class Skill(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.name)
+
+ '''
+
+- Register the model in the admin panel 
+
+- Create a new file user-profile.html 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+
+dsfdsfds
+
+{% endblock content %}
+'''
+
+- Create userProfile view 
+
+'''
+def userProfile(request, pk):
+    return render(request, 'users/user-profile.html')
+'''
+
+- create url for user profile
+
+'''
+from django.urls import path 
+from . import views 
+
+urlpatterns = [
+    path('', views.profiles, name='profiles'),
+    path('profile/<str:pk>/', views.userProfile, name='user-profile'),
+]
+
+'''
+
+26/ Django Signals 
+
+- We want to send an email to the user when they sign up or some actions are being performed by the user
+- Signals are just the way of listening to certain actions that are performed in our application and they can fire off certain events
+- comprises of sender and listener 
+
+
+- Sender: user model 
+- reciever: when method / action called (Reciever trigger action)
+
+
+- Go inside users.models 
+
+'''
+
+from django.db import models
+from django.contrib.auth.models import User
+import uuid
+
+from django.db.models.signals import post_save, post_delete
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=500, blank=True, null=True)
+    username = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    short_intro = models.CharField(max_length=200, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True, upload_to='profiles/', default='profiles/user-default.png')
+    social_github = models.CharField(max_length=200, blank=True, null=True)
+    social_twitter = models.CharField(max_length=200, blank=True, null=True)
+    social_linkedin = models.CharField(max_length=200, blank=True, null=True)
+    social_youtube = models.CharField(max_length=200, blank=True, null=True)
+    social_website = models.CharField(max_length=200, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.username)
+
+class Skill(models.Model):
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.name)
+
+def profileUpdated(sender, instance, created, **kwargs):
+    print('Profile saved!')
+    print('Instance: ', instance)
+    print('CREATED: ', created)
+
+def deleteUser(sender, instance, **kwargs):
+    print('Deleting user...')
+
+
+post_save.connect(profileUpdated, sender=Profile)
+post_delete.connect(deleteUser, sender=Profile)
+
+'''
+
+- We can do the same exact thing by triggering with reciever or decorator 
+
+'''
+from django.db import models
+from django.contrib.auth.models import User
+import uuid
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=500, blank=True, null=True)
+    username = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    short_intro = models.CharField(max_length=200, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True, upload_to='profiles/', default='profiles/user-default.png')
+    social_github = models.CharField(max_length=200, blank=True, null=True)
+    social_twitter = models.CharField(max_length=200, blank=True, null=True)
+    social_linkedin = models.CharField(max_length=200, blank=True, null=True)
+    social_youtube = models.CharField(max_length=200, blank=True, null=True)
+    social_website = models.CharField(max_length=200, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.username)
+
+class Skill(models.Model):
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.name)
+        
+
+@receiver(post_save, sender=Profile)
+def profileUpdated(sender, instance, created, **kwargs):
+    print('Profile saved!')
+    print('Instance: ', instance)
+    print('CREATED: ', created)
+
+def deleteUser(sender, instance, **kwargs):
+    print('Deleting user...')
+
+
+
+# post_save.connect(profileUpdated, sender=Profile)
+# post_delete.connect(deleteUser, sender=Profile)
+
+'''
+
+- We will create a signal any time user profile is created 
+
+
+'''
+from django.db import models
+from django.contrib.auth.models import User
+import uuid
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=500, blank=True, null=True)
+    username = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    short_intro = models.CharField(max_length=200, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True, upload_to='profiles/', default='profiles/user-default.png')
+    social_github = models.CharField(max_length=200, blank=True, null=True)
+    social_twitter = models.CharField(max_length=200, blank=True, null=True)
+    social_linkedin = models.CharField(max_length=200, blank=True, null=True)
+    social_youtube = models.CharField(max_length=200, blank=True, null=True)
+    social_website = models.CharField(max_length=200, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.username)
+
+class Skill(models.Model):
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.name)
+
+
+# @receiver(post_save, sender=Profile)
+def createProfile(sender, instance, created, **kwargs):
+    if created:
+        user = instance
+        profile = Profile.objects.create(
+            user=user,
+            username=user.username,
+            email=user.email,
+            name=user.first_name,
+        )
+
+def deleteUser(sender, instance, **kwargs):
+    print('Deleting user...')
+
+
+
+post_save.connect(createProfile, sender=User)
+
+
+post_delete.connect(deleteUser, sender=Profile)
+
+'''
+
+- Now in case if admin deletes the profile and we still got the user, so in this case we need to delete user, so signals are helpful here 
+
+'''
+from django.db import models
+from django.contrib.auth.models import User
+import uuid
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=500, blank=True, null=True)
+    username = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)
+    short_intro = models.CharField(max_length=200, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(blank=True, null=True, upload_to='profiles/', default='profiles/user-default.png')
+    social_github = models.CharField(max_length=200, blank=True, null=True)
+    social_twitter = models.CharField(max_length=200, blank=True, null=True)
+    social_linkedin = models.CharField(max_length=200, blank=True, null=True)
+    social_youtube = models.CharField(max_length=200, blank=True, null=True)
+    social_website = models.CharField(max_length=200, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.username)
+
+class Skill(models.Model):
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return str(self.name)
+
+
+# @receiver(post_save, sender=Profile)
+def createProfile(sender, instance, created, **kwargs):
+    if created:
+        user = instance
+        profile = Profile.objects.create(
+            user=user,
+            username=user.username,
+            email=user.email,
+            name=user.first_name,
+        )
+
+def deleteUser(sender, instance, **kwargs):
+    user = instance.user 
+    user.delete()
+
+
+post_save.connect(createProfile, sender=User)
+post_delete.connect(deleteUser, sender=Profile)
+'''
+
+- Now we will separate the signals code from the models, to make cleaner code  
+
+- Inside users folder, create a new file, signals.py 
+
+
+'''
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+from django.contrib.auth.models import User
+from .models import Profile
+
+# @receiver(post_save, sender=Profile)
+def createProfile(sender, instance, created, **kwargs):
+    if created:
+        user = instance
+        profile = Profile.objects.create(
+            user=user,
+            username=user.username,
+            email=user.email,
+            name=user.first_name,
+        )
+
+def deleteUser(sender, instance, **kwargs):
+    user = instance.user 
+    user.delete()
+
+
+post_save.connect(createProfile, sender=User)
+post_delete.connect(deleteUser, sender=Profile)
+
+'''
+
+- Configure signals in our app. So to let the django know the signal is triggered, go to users.apps.py 
+
+'''
+from django.apps import AppConfig
+
+
+class UsersConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "users"
+
+    def ready(self):
+        import users.signals
+
+
+'''
+
+This might not work if we connected our app in INSTALLED_APPS as directly app name eg 'users', not 'users.apps.UsersConfig'
+
+27/ Authentication: User login, logout and flash messages 
+
+- Authentication: (Who) determining who the user is, submitting some details and checking with database 
+- Authorization: (what users can do) restricting resources, permissions to certain users 
+
+
+- Inside users folder, create a new template login_register.html 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<form action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Username"/>
+    <input type="password" name="password" placeholder="Enter password"/>
+    <input type="submit" value="Login" />
+</form>
+
+{% endblock content %}
+'''
+
+- Go into views 
+
+'''
+def loginUser(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            print("Username does not exist ")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('profiles')
+        else:
+            print("Username OR password is incorrect ")
+
+    return render(request, 'users/login_register.html')
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect('login')
+
+    '''
+
+- Create urls 
+
+'''
+from django.urls import path 
+from . import views 
+
+urlpatterns = [
+    path('login/', views.loginUser, name='login'),
+    path('logout/', views.logoutUser, name='logout'),
+
+    path('', views.profiles, name='profiles'),
+    path('profile/<str:pk>/', views.userProfile, name='user-profile'),
+]
+'''
+
+- Go to the navbar.html and add the route
+
+'''
+
+{% load static %}
+
+<!-- Header Section -->
+<header class="header">
+<div class="container container--narrow">
+    <a href="{% url 'profiles' %}" class="header__logo">
+    <img src="{% static 'images/logo.svg' %}" alt="DevSearch Logo" />
+    </a>
+    <nav class="header__nav">
+    <input type="checkbox" id="responsive-menu" />
+    <label for="responsive-menu" class="toggle-menu">
+        <span>Menu</span>
+        <div class="toggle-menu__lines"></div>
+    </label>
+    <ul class="header__menu">
+        <li class="header__menuItem"><a href="{% url 'profiles' %}">Developers</a></li>
+        <li class="header__menuItem"><a href="{% url 'projects' %}">Projects</a></li>
+        <li class="header__menuItem"><a href="">Inbox</a></li>
+        <li class="header__menuItem"><a href="{% url 'create-project' %}">Add Project</a></li>
+
+        {% if request.user.is_authenticated%}
+        <li class="header__menuItem"><a href="{% url 'logout' %}" class="btn btn--sub">Logout</a></li>
+        {% else%}
+        <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a></li>
+        {% endif %}
+
+    </ul>
+    </nav>
+</div>
+</header>
+
+'''
+
+
+- Let's restrict the logged in user from seeing certain page i.e restrict user to go to login page if logged in 
+
+'''
+
+def loginUser(request):
+    
+    if request.user.is_authenticated:
+        return redirect('profiles')
+
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            print("Username does not exist ")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('profiles')
+        else:
+            print("Username OR password is incorrect ")
+
+    return render(request, 'users/login_register.html')
+
+
+'''
+
+
+- restrict unauthenticated users from seeing certain page : there are certain ways but for now we will use decorators 
+
+inside projects.views 
+
+'''
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from .models import Project
+from .forms import ProjectForm
+
+def projects(request):
+    projects = Project.objects.all()
+    context = {'projects': projects}
+    return render(request, 'projects/projects.html', context)
+
+
+def project(request, pk):
+    projectObj = Project.objects.get(id=pk)
+    tags = projectObj.tags.all()
+    print({'projectObj': projectObj})
+    return render(request, 'projects/single-project.html', {'project': projectObj})
+
+@login_required(login_url="login")
+def createProject(request):
+    form = ProjectForm()
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('projects')
+
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+@login_required(login_url="login")
+def updateProject(request, pk):
+    project = Project.objects.get(id=pk)
+    form = ProjectForm(instance=project)
+
+    if request.method == 'POST':
+        form = ProjectForm(request.POST, request.FILES, instance=project)
+        if form.is_valid():
+            form.save()
+            return redirect('projects')
+            
+    context = {'form': form}
+    return render(request, 'projects/project_form.html', context)
+
+@login_required(login_url="login")
+def deleteProject(request, pk):
+    project = Project.objects.get(id=pk)
+    if request.method == 'POST':
+        project.delete()
+        return redirect('projects')
+
+    context = {'object': project}
+    return render(request, 'projects/delete_template.html', context)
+'''
+
+
+- Inside the navbar.html
+
+'''
+   {% if request.user.is_authenticated%}
+        <li class="header__menuItem"><a href="{% url 'create-project' %}">Add Project</a></li>
+        <li class="header__menuItem"><a href="{% url 'logout' %}" class="btn btn--sub">Logout</a></li>
+        {% else%}
+        <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a></li>
+    {% endif %}
+
+
+'''
+
+- Flash messages: when user enters wrong inputs , one time messages that we can see in our templates , if we refresh it will be gone 
+
+- go into users app view 
+
+'''
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import Profile 
+
+
+
+def loginUser(request):
+    
+    if request.user.is_authenticated:
+        return redirect('profiles')
+
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            messages.error(request, "Username does not exist ")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('profiles')
+        else:
+           messages.error(request, "Username OR password is incorrect ")
+
+    return render(request, 'users/login_register.html')
+'''
+
+- Inside the template , main.html 
+
+'''
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
+    
+    <!-- Icon - Boxicon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Icon - IconMonster -->
+    <link rel="stylesheet" href="https://cdn.iconmonstr.com/1.3.0/css/iconmonstr-iconic-font.min.css" />
+    <!-- Mumble UI -->
+    <link rel="stylesheet" href="{% static 'uikit/styles/uikit.css' %}" />
+    <!-- Dev Search UI -->
+    <link rel="stylesheet" href="{% static 'styles/app.css' %}" />
+
+    <title>RyuDevs - Connect with Developers From the Land of Thunder Dragon!</title>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% block content %} 
+
+    {% endblock content %}
+
+</body> 
+</html>
+'''
+
+28/ User registration 
+
+- Go to users view and create a new view 
+
+'''
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from .models import Profile 
+
+
+
+def loginUser(request):
+    page = 'login'
+    if request.user.is_authenticated:
+        return redirect('profiles')
+
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            messages.error(request, "Username does not exist ")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('profiles')
+        else:
+           messages.error(request, "Username OR password is incorrect ")
+
+    return render(request, 'users/login_register.html')
+
+def logoutUser(request):
+    logout(request)
+    messages.error(request, "User was logged out")
+    return redirect('login')
+
+def registerUser(request):
+    page = 'register'
+    form = UserCreationForm
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+
+            messages.success(request, "User was successfully registered")
+
+            login(request, user)
+            return redirect('profiles')
+        else:
+            messages.error(request, "An error occurred while registering")
+
+
+    context = {'page': page, 'form': form}
+    return render(request, 'users/login_register.html', context)
+
+'''
+
+- Inside login_register.html 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+{% if page == 'register' %}
+    <h1>Register User</h1>
+    <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" value="Register User" />
+    </form>
+    <p>Already have an account <a href="{% url 'login' %}">Login</a></p>
+{% else %}
+<form action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Username"/>
+    <input type="password" name="password" placeholder="Enter password"/>
+    <input type="submit" value="Login" />
+
+    <p>Don't have an account <a href="{% url 'register' %}">Sign up</a></p>
+</form>
+{% endif %}
+{% endblock content %}
+'''
+
+- We can customize UserCreationForm by creating forms.py inside users app 
+
+forms.py 
+
+'''
+from django.forms import ModelForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User 
+        fields = [
+            'first_name', 'email', 'username', 'password1', 'password2'
+        ]
+
+        labels = { 
+            'first_name': 'Name',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class':'input'})
+
+'''
+
+
+- Go to views.py 
+
+'''
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import Profile 
+from .forms import CustomUserCreationForm
+
+
+
+def loginUser(request):
+    page = 'login'
+    if request.user.is_authenticated:
+        return redirect('profiles')
+
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            messages.error(request, "Username does not exist ")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('profiles')
+        else:
+           messages.error(request, "Username OR password is incorrect ")
+
+    return render(request, 'users/login_register.html')
+
+def logoutUser(request):
+    logout(request)
+    messages.info(request, "User was logged out")
+    return redirect('login')
+
+def registerUser(request):
+    page = 'register'
+    form = CustomUserCreationForm
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+
+            messages.success(request, "User was successfully registered")
+
+            login(request, user)
+            return redirect('profiles')
+        else:
+            messages.error(request, "An error occurred while registering")
+
+
+    context = {'page': page, 'form': form}
+    return render(request, 'users/login_register.html', context)
+'''
+
+
+- in main.html 
+
+'''
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon" />
+    
+    <!-- Icon - Boxicon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Icon - IconMonster -->
+    <link rel="stylesheet" href="https://cdn.iconmonstr.com/1.3.0/css/iconmonstr-iconic-font.min.css" />
+    <!-- Mumble UI -->
+    <link rel="stylesheet" href="{% static 'uikit/styles/uikit.css' %}" />
+    <!-- Dev Search UI -->
+    <link rel="stylesheet" href="{% static 'styles/app.css' %}" />
+
+    <title>RyuDevs - Connect with Developers From the Land of Thunder Dragon!</title>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <!-- {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %} -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+            <div class="alert alert--{{message.tags}}">
+                <p class="alert__message">{{message}}</p>
+                <button class="alert__close">x</button>
+            </div>
+        {% endfor %}
+
+    {% endif %}
+
+    {% block content %} 
+
+    {% endblock content %}
+
+</body> 
+<script src="{% static 'uikit/app.js' %}"></script>
+</html>
+
+'''
+
+29/ User account 
+
+- Views 
+
+'''
+
+@login_required(login_url='login')
+def userAccount(request):
+
+    profile = request.user.profile
+
+    skills = profile.skill_set.all()
+    projects = profile.project_set.all()
+   
+    context = {'profile': profile, 'skills': skills, 'projects': projects}
+    return render(request, 'users/account.html', context)
+'''
+
+
+- urls.py 
+
+'''
+path('account/', views.userAccount, name='account'),
+'''
+
+
+- account.html
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="settingsPage profile my-md">
+  <div class="container">
+    <div class="layout">
+      <div class="column column--1of3">
+        <div class="card text-center">
+          <div class="card__body dev">
+            <a class="tag tag--pill tag--main settings__btn" href="#"><i class='bx bxs-edit'></i> Edit</a>
+            <img class="avatar avatar--xl dev__avatar" src="{{profile.profile_image.url}}" />
+            <h2 class="dev__name">{{profile.name}}</h2>
+            <p class="dev__title">{{profile.short_intro}}</p>
+            <p class="dev__location">Based in {{profile.location}}</p>
+
+            <ul class="dev__social">
+              {% if profile.social_github %}
+              <li>
+                  <a title="Github" href="{{profile.social_github}}" target="_blank"><i class='bx bxl-github'></i></a>
+              </li>
+              {% endif %}
+
+              {% if profile.social_youtube %}
+              <li>
+                  <a title="YouTube" href="{{profile.social_youtube}}" target="_blank"><i class='bx bxl-youtube' ></i></a>
+              </li>
+              {% endif %}
+
+              {% if profile.social_twitter %}
+              <li>
+                  <a title="Twitter" href="{{profile.social_twitter}}" target="_blank"><i class='bx bxl-twitter' ></i></a>
+              </li>
+              {% endif %}
+
+              {% if profile.social_linkedin %}
+              <li>
+                  <a title="LinkedIn" href="{{profile.social_linkedin}}" target="_blank"><i class='bx bxl-linkedin' ></i></a>
+              </li>
+              {% endif %}
+
+              {% if profile.social_website %}
+              <li>
+                  <a title="Personal Website" href="{{profile.social_website}}" target="_blank"><i class='bx bx-globe' ></i></a>
+              </li>
+              {% endif %}
+            </ul>
+            
+          </div>
+        </div>
+      </div>
+      <div class="column column--2of3">
+        <div class="devInfo">
+          <h3 class="devInfo__title">About Me</h3>
+          <p class="devInfo__about">{{profile.bio}}</p>
+        </div>
+        <div class="settings">
+          <h3 class="settings__title">Skills</h3>
+          <a class="tag tag--pill tag--sub settings__btn tag--lg" href="#"><i class='bx bx-plus' ></i> Add Skill</a>
+        </div>
+
+        <table class="settings__table">
+
+          {% for skill in skills %}
+          <tr>
+            <td class="settings__tableInfo">
+              <h4>{{skill.name}}</h4>
+              <p>{{skill.description}}</p>
+            </td>
+            <td class="settings__tableActions">
+              <a class="tag tag--pill tag--main settings__btn" href="#"><i class='bx bxs-edit'></i></i> Edit</a>
+              <a class="tag tag--pill tag--main settings__btn" href="#"><i class='bx bx-x-circle'></i>
+                Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+
+        
+        </table>
+
+        <div class="settings">
+          <h3 class="settings__title">Projects</h3>
+          <a class="tag tag--pill tag--sub settings__btn tag--lg" href="#"><i class='bx bx-plus' ></i> Add Project</a>
+        </div>
+
+        <table class="settings__table">
+
+          {% for project in projects %}
+          <tr>
+            <td class="settings__thumbnail">
+              <a href="{% url 'project' project.id %}"><img src="{{project.featured_image.url}}" alt="Project Thumbnail" /></a>
+            </td>
+            <td class="settings__tableInfo">
+              <a href="{% url 'project' project.id %}">{{project.title}}</a>
+              <p>{{project.description|slice:"150"}}</p>
+            </td>
+            <td class="settings__tableActions">
+              <a class="tag tag--pill tag--main settings__btn" href="#"><i class='bx bxs-edit'></i> Edit</a>
+              <a class="tag tag--pill tag--main settings__btn" href="#"><i class='bx bx-x-circle'></i>
+                Delete</a>
+            </td>
+          </tr>
+          {% endfor %}
+
+       
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+{% endblock content %}
+'''
+
+30/ User edit profile 
+
+-Inside users templates, create profile_form.html 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h1>Edit account</h1>
+
+<form method="POST" action="{% url 'edit-account' %}">
+    {% csrf_token %}
+    <input type="submit" value="Submit" />
+</form>
+
+{% endblock content %}
+'''
+
+- Let's go to the views now 
+
+'''
+
+'''
+
+31/ Search 
+
+- Give the name to the form input fields inside profiles.html and method to be GET since we are just makin the query 
+
+
+'''
+
+
+        <div class="hero-section__search">
+            <form class="form" action="{% url 'profiles' %}" method="get">
+                <div class="form__field">
+                    <label for="formInput#search">Search Developers </label>
+                    <input class="input input--text" id="formInput#search" type="text" name="search_query"
+                    placeholder="Search by developer name" value="{{search_query}}" />
+                </div>
+
+                <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+            </form>
+        </div>
+            '''
+
+
+- users view, go inside profiles 
+
+'''
+def profiles(request):
+    search_query = ''
+
+    if request.GET.get('search_query'):
+        search_query = request.GET.get('search_query')
+
+    profiles = Profile.objects.filter(name__icontains=search_query)
+    context = {
+        'profiles': profiles,
+        'search_query': search_query
+    }
+    return render(request, 'users/profiles.html', context)
+
+
+'''
+
+- In case we want to search using multiple lookups we will use Q lookup
+
+'''
+from django.db.models import Q
+def profiles(request):
+    search_query = ''
+
+    if request.GET.get('search_query'):
+        search_query = request.GET.get('search_query')
+
+    profiles = Profile.objects.filter(
+        Q(name__icontains=search_query) | Q(short_intro__icontains=search_query)
+        
+    )
+    context = {
+        'profiles': profiles,
+        'search_query': search_query
+    }
+    return render(request, 'users/profiles.html', context)
+
+'''
+
+- Search skills , use distinct() to avoid duplicates
+
+
+'''
+def profiles(request):
+    search_query = ''
+
+    if request.GET.get('search_query'):
+        search_query = request.GET.get('search_query')
+
+    skills = Skill.objects.filter(name__icontains=search_query)
+
+    profiles = Profile.objects.distinct().filter(
+        Q(name__icontains=search_query) | 
+        Q(short_intro__icontains=search_query) |
+        Q(skill__in=skills)        
+    )
+    context = {
+        'profiles': profiles,
+        'search_query': search_query
+    }
+    return render(request, 'users/profiles.html', context)
+    
+'''
+
+
+- similarly for projects, here we will even query for many to many fields which is Tag 
+
+projects.views 
+
+
+'''
+def projects(request):
+    projects, search_query = searchProjects(request)
+
+    context = {'projects': projects, 'search_query': search_query}
+    return render(request, 'projects/projects.html', context)
+
+
+
+'''
+
+utils.py 
+
+'''
+from .models import Project, Tag
+from django.db.models import Q
+
+def searchProjects(request):
+
+    search_query = ''
+
+    if request.GET.get('search_query'):
+        search_query = request.GET.get('search_query')
+
+    tags = Tag.objects.filter(name__icontains=search_query)
+
+    projects = Project.objects.distinct().filter(
+        Q(title__icontains=search_query) |
+        Q(description__icontains=search_query) |
+        Q(owner__name__icontains=search_query) |
+        Q(tags__in=tags)
+    )
+
+    return projects, search_query
+'''
+
+
+32/ Pagination: when the page exceeds certain number of items
+
+- Django gives us the paginator class : django Paginator https://docs.djangoproject.com/en/4.1/topics/pagination/
+
+views.py
+'''
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
+
+
+
+
+'''
+
+- utils.py 
+
+'''
+from .models import Project, Tag
+from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
+
+def paginateProjects(request, projects, results):
+
+    page = request.GET.get('page')
+    
+    paginator = Paginator(projects, results)
+
+    try: 
+        projects = paginator.page(page)
+    except PageNotAnInteger:
+        page = 1
+        projects = paginator.page(page)
+
+    except EmptyPage:
+        page = paginator.num_pages
+        projects = paginator.page(page)
+
+    leftIndex = (int(page) - 4)
+    if leftIndex < 1:
+        leftIndex = 1
+
+    rightIndex = (int(page) + 5)
+    if rightIndex > paginator.num_pages:
+        rightIndex = paginator.num_pages + 1
+
+    custom_range = range(leftIndex, rightIndex)
+
+    return custom_range, projects
+'''
+
+- projects.html 
+
+'''
+
+{% extends 'main.html' %}
+{% block content %}
+
+<!-- Main Section -->
+<main class="projects">
+    <section class="hero-section text-center">
+      <div class="container container--narrow">
+        <div class="hero-section__box">
+          <h2>Search for <span>Projects</span></h2>
+        </div>
+
+        <div class="hero-section__search">
+          <form class="form" action="{% url 'projects' %}" method="get">
+            <div class="form__field">
+              <label for="formInput#search">Search By Projects </label>
+              <input class="input input--text" id="formInput#search" type="text" name="search_query"
+                placeholder="Search by Project Title" value="{{search_query}}" />
+            </div>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- Search Result: DevList -->
+    <section class="projectsList">
+      <div class="container">
+        <div class="grid grid--three">
+            {% for project in projects %}
+            <div class="column">
+                <div class="card project">
+                <a href="{% url 'project' project.id %}" class="project">
+                    <img class="project__thumbnail" src="{{ project.featured_image.url }}" alt="project thumbnail" />
+                    <div class="card__body">
+                    <h3 class="project__title">{{project.title}}</h3>
+                    <p><a class="project__author" href="{% url 'user-profile' project.owner.id %}">By {{project.owner.name}}</a></p>
+                    <p class="project--rating">
+                        <span style="font-weight: bold;">{{project.vote_ratio}}%</span> Postitive
+                        Feedback ({{project.vote_total}} Vote{{project.vote_total|pluralize:"s"}})
+                    </p>
+                    <div class="project__tags">
+                        {% for tag in project.tags.all %}
+                        <span class="tag tag--pill tag--main">
+                        <small>{{tag}}</small>
+                        </span>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </a>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+      </div>
+    </section>
+
+
+    {% if projects.has_other_pages %}
+    <div class="pagination">
+      <ul class="container">
+
+        {% if projects.has_previous %}
+          <li><a href="?page={{projects.previous_page_number}}" class="btn page-link">&#10094; Prev</a></li>
+        {% endif %}
+
+        {% for page in custom_range %}   
+          {% if page == projects.number %}     
+          <li><a href="?page={{page}}" class="btn page-link btn--sub">{{page}}</a></li>
+          {% else %}
+          <li><a href="?page={{page}}" class="btn page-link">{{page}}</a></li>
+          {% endif %}
+
+        {% endfor %}
+
+        {% if projects.has_next %}
+          <li><a href="?page={{projects.next_page_number}}" class="btn page-link">Next &#10095;</a></li>
+        {% endif %}
+
+        
+      </ul>
+    </div>
+
+    {% endif %}
+
+  </main>
+
+
+{% endblock content %}
+
+'''
+
+- To export pagination template, create a pagination.html inside the root directory and include in other templates 
+
+'''
+{% if queryset.has_other_pages %}
+<div class="pagination">
+    <ul class="container">
+
+    {% if queryset.has_previous %}
+        <li><a href="?page={{queryset.previous_page_number}}" class="btn page-link">&#10094; Prev</a></li>
+    {% endif %}
+
+    {% for page in custom_range %}   
+        {% if page == queryset.number %}     
+        <li><a href="?page={{page}}" class="btn page-link btn--sub">{{page}}</a></li>
+        {% else %}
+        <li><a href="?page={{page}}" class="btn page-link">{{page}}</a></li>
+        {% endif %}
+
+    {% endfor %}
+
+    {% if queryset.has_next %}
+        <li><a href="?page={{queryset.next_page_number}}" class="btn page-link">Next &#10095;</a></li>
+    {% endif %}
+
+    
+    </ul>
+</div>
+
+{% endif %}
+'''
+
+- include it and pass the properties as below 
+
+'''
+{% include 'pagination.html' with queryset=projects  custom_range=custom_range %}
+'''
+
+33/ Search and pagination bug, when we try to search for a project and if it got 3 to 4 pages of results, if we click on the next pages the search filter gets removed 
+
+so to fix this we will try to implement it using JavaScript 
+
+
+- go inside pagination.html of root directory
+
+'''
+
+{% if queryset.has_other_pages %}
+<div class="pagination">
+    <ul class="container">
+
+    {% if queryset.has_previous %}
+        <li><a href="?page={{queryset.previous_page_number}}" class="btn page-link" data-page="{{queryset.previous_page_number}}">&#10094; Prev</a></li>
+    {% endif %}
+
+    {% for page in custom_range %}   
+        {% if page == queryset.number %}     
+        <li><a href="?page={{page}}" class="btn page-link btn--sub" data-page="{{page}}">{{page}}</a></li>
+        {% else %}
+        <li><a href="?page={{page}}" class="btn page-link" data-page="{{page}}">{{page}}</a></li>
+        {% endif %}
+
+    {% endfor %}
+
+    {% if queryset.has_next %}
+        <li><a href="?page={{queryset.next_page_number}}" class="btn page-link" data-page="{{queryset.next_page_number}}}}">Next &#10095;</a></li>
+    {% endif %}
+
+    
+    </ul>
+</div>
+
+{% endif %}
+
+<script type="text/javascript">
+
+    // GET SEARCH FORM AND PAGE LINKS 
+    let searchForm = document.getElementById('searchForm');
+    let pageLinks = document.getElementsByClassName('page-link')
+
+    // ENSURE SEARCH FORM EXISTS 
+    if(searchForm){
+        for (let i = 0; pageLinks.length > i; i++){
+            pageLinks[i].addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                
+                // GET THE DATA ATTRIBUTE
+                let page = this.dataset.page
+                
+
+                // ADD HIDDEN SEARCH INPUT TO FORM
+                searchForm.innerHTML += `<input value=${page} name="page" hidden />`
+
+                // SUBMIT FORM 
+                searchForm.submit()
+
+            })
+        }
+
+    }
+</script>
+
+'''
+
+
+
+- inside projects.html 
+
+'''
+<div class="hero-section__search">
+          <form id="searchForm" class="form" action="{% url 'projects' %}" method="get">
+            <div class="form__field">
+              <label for="formInput#search">Search By Projects </label>
+              <input class="input input--text" id="formInput#search" type="text" name="search_query"
+                placeholder="Search by Project Title" value="{{search_query}}" />
+            </div>
+
+            <input class="btn btn--sub btn--lg" type="submit" value="Search" />
+          </form>
+        </div>
+'''
+
+
+- OR separate script from html and create separate file main.js inside the static folder 
+
+34/ Reviews: let users give a vote and comment but your vote will be anonymous and no one will actually see who upvoted or downvoted, user can only leave one review per project  
+
+
+- inside the projects app and inside the models : unique_together inside class Meta to bind project and owner and not to have two reviews by same user 
+
+'''
+
+class Review(models.Model):
+    VOTE_TYPE = (
+        ('up', 'Up Vote'),
+        ('down', 'Down Vote'),
+    )
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    body = models.TextField(blank=True, null=True)
+    value = models.CharField(max_length=200, choices=VOTE_TYPE)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    class Meta: 
+        unique_together = [['owner', 'project']]
+
+        
+    def __str__(self):
+        return self.value
+
+
+        '''
+
+
+- inside single-project.html for comments list 
+
+'''
+
+<div class="commentList">
+
+            {% for review in project.review_set.all %}
+
+            {% if review.body %}
+                <div class="comment">
+                    <a href="{% url 'user-profile' review.owner.id %}">
+                        <img class="avatar avatar--md"
+                        src="{{review.owner.profile_image.url}}" alt="user" />
+                    </a>
+
+                    
+                    <div class="comment__details">
+                        <a href="{% url 'user-profile' review.owner.id %}" class="comment__author">{{review.owner.name}}</a>
+                        <p class="comment__info">{{review.body|linebreaksbr}}</p>
+                    </div>
+                    
+                </div>
+            {% endif %}
+            {% endfor %}
+
+        </div>
+        </div>
+
+        '''
+
+- Create a form to add some data for review 
+
+inside the forms.py 
+
+'''
+class ReviewForm(ModelForm):
+    class Meta:
+        model = Review
+        fields = ['value', 'body']
+
+        labels = {
+            'value': 'Place your vote',
+            'body': 'Add a comment with your vote'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ReviewForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class':'input'})
+
+'''
+
+- Inside the views.py 
+
+'''
+
+def project(request, pk):
+    projectObj = Project.objects.get(id=pk)
+    form = ReviewForm()
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        review = form.save(commit=False)
+        review.project = projectObj
+        review.owner = request.user.profile 
+        review.save()
+
+        # update project vote count
+        messages.success(request, 'Your review was successfully submitted')
+        return redirect('project', pk=projectObj.id)
+
+    return render(request, 'projects/single-project.html', {'project': projectObj, 'form': form})
+
+
+'''
+
+- inside single-project.html
+'''
+ <form class="form" action="{% url 'project' project.id %}" method="POST">
+            
+            {% for field in form %}
+
+            <div class="form__field">
+                <label for="formInput#textarea">{{field.label}}: </label>
+                {{field}}
+            </div>
+            {% endfor %}
+            <input class="btn btn--sub btn--lg" type="submit" value="Comments" />
+        </form>
+'''
+
+- Inside the models.py 
+'''
+
+from django.db import models
+import uuid
+from users.models import Profile
+# Create your models here.
+
+class Project(models.Model):
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    featured_image = models.ImageField(null=True, blank=True, default='default.jpg')
+    demo_link = models.CharField(max_length=2000, null=True, blank=True)
+    source_link = models.CharField(max_length=2000, null=True, blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
+    vote_total = models.IntegerField(default=0, null=True, blank=True)
+    vote_ratio = models.IntegerField(default=0, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return self.title 
+
+    class Meta:
+        ordering = ['created']
+
+    @property
+    def getVoteCount(self):
+        reviews = self.review_set.all()
+        upVotes = reviews.filter(value='up')
+        totalVotes = reviews.count()
+        
+        ratio = (upVotes / totalVotes) * 100
+        self.vote_total = totalVotes
+        self.vote_ratio = ratio
+        
+        self.save()
+
+class Review(models.Model):
+    VOTE_TYPE = (
+        ('up', 'Up Vote'),
+        ('down', 'Down Vote'),
+    )
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    body = models.TextField(blank=True, null=True)
+    value = models.CharField(max_length=200, choices=VOTE_TYPE)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    class Meta: 
+        unique_together = [['owner', 'project']]
+
+
+    def __str__(self):
+        return self.value
+
+class Tag(models.Model):
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.name
+
+        '''
+
+- Now let's sort the projects by the highest rated votes inside models 
+'''
+
+class Project(models.Model):
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    featured_image = models.ImageField(null=True, blank=True, default='default.jpg')
+    demo_link = models.CharField(max_length=2000, null=True, blank=True)
+    source_link = models.CharField(max_length=2000, null=True, blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
+    vote_total = models.IntegerField(default=0, null=True, blank=True)
+    vote_ratio = models.IntegerField(default=0, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return self.title 
+
+    class Meta:
+        ordering = ['-vote_ratio', '-vote_total', 'title']
+
+    @property
+    def getVoteCount(self):
+        reviews = self.review_set.all()
+        upVotes = reviews.filter(value='up').count()
+        totalVotes = reviews.count()
+        
+        ratio = (upVotes / totalVotes) * 100
+        self.vote_total = totalVotes
+        self.vote_ratio = ratio
+
+        self.save()
+
+
+'''
+
+- Not let users to vote more than once, or owners to vote by himself. To get simple list of ids, not objects, use flat=True
+
+'''
+from django.db import models
+import uuid
+from users.models import Profile
+# Create your models here.
+
+class Project(models.Model):
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    featured_image = models.ImageField(null=True, blank=True, default='default.jpg')
+    demo_link = models.CharField(max_length=2000, null=True, blank=True)
+    source_link = models.CharField(max_length=2000, null=True, blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
+    vote_total = models.IntegerField(default=0, null=True, blank=True)
+    vote_ratio = models.IntegerField(default=0, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    
+    def __str__(self):
+        return self.title 
+
+    class Meta:
+        ordering = ['-vote_ratio', '-vote_total', 'title']
+
+    @property
+    def reviewers(self):
+        queryset = self.review_set.all().values_list('owner__id', flat=True)
+        return queryset 
+
+    @property
+    def getVoteCount(self):
+        reviews = self.review_set.all()
+        upVotes = reviews.filter(value='up').count()
+        totalVotes = reviews.count()
+        
+        ratio = (upVotes / totalVotes) * 100
+        self.vote_total = totalVotes
+        self.vote_ratio = ratio
+
+        self.save()
+'''
+
+- Inside single-project.html 
+
+'''
+<div class="comments">
+        <h3 class="singleProject__subtitle">Feedback</h3>
+        <h5 class="project--rating">
+            {{project.vote_ratio}}% Postitive Feedback ({{project.vote_total}} Vote{{project.vote_total|pluralize:"s"}})
+        </h5>
+
+        {% if request.user.profile.id in project.reviewers %}
+
+            <p>You have already submitted your review for this project</p>
+
+        {% elif request.user.profile == project.owner %}
+            <p>You cannot review your own work</p>
+        {% elif request.user.is_authenticated %}
+            <form class="form" action="{% url 'project' project.id %}" method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+
+                <div class="form__field">
+                    <label for="formInput#textarea">{{field.label}}: </label>
+                    {{field}}
+                </div>
+                {% endfor %}
+                <input class="btn btn--sub btn--lg" type="submit" value="Comments" />
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}?next={{request.path}}">Please login to leave a review</a>
+        {% endif %}
+
+
+'''
+
+- go to login_register.html inside users app leave the form action to be blank
+
+
+- views.py of users app 
+
+'''
+
+def loginUser(request):
+    page = 'login'
+    if request.user.is_authenticated:
+        return redirect('profiles')
+
+
+    if request.method == 'POST':
+        username = request.POST['username'].lower()
+        password = request.POST['password']
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            messages.error(request, "Username does not exist ")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect(request.GET['next'] if 'next' in request.GET else 'account')
+        else:
+           messages.error(request, "Username OR password is incorrect ")
+
+    return render(request, 'users/login_register.html')
+
+
+'''
+
+35/ Messages : go inside users model 
+
+'''
+class Message(models.Model):
+    sender = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)
+    recipient = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name='messages')
+    name = models.CharField(max_length=200, null=True, blank=True)
+    email = models.EmailField(max_length=200, null=True, blank=True)
+    subject = models.CharField(max_length=200, null=True, blank=True)
+    body = models.TextField()
+    is_read = models.BooleanField(default=False, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.subject
+    
+    class Meta:
+        ordering = ['is_read', '-created']
+
+        '''
+
+- Register inside the admin panel
+
+- Create a inbox template inside users app
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+<!-- Main Section -->
+<main class="inbox my-xl">
+  <div class="content-box">
+    <h3 class="inbox__title">New Messages(<span>{{unreadCount}}</span>)</h3>
+    <ul class="messages">
+
+      {% for message in messageRequests %}
+
+      {% if message.is_read == False %}
+      <li class="message message--unread">
+
+      {% else %}
+      <li class="message">
+      {% endif %}
+        <a href="{% url 'message' message.id %}">
+          <span class="message__author">{{message.name}}</span>
+          <span class="message__subject">{{message.subject}}</span>
+          <span class="message__date">May 31, 2021, 04:37 PM</span>
+        </a>
+      </li>
+      {% endfor %}
+    
+    </ul>
+  </div>
+</main>
+
+
+{% endblock content %}
+'''
+
+- Create inbox route from views
+
+'''
+@login_required(login_url='login')
+def inbox(request):
+    profile = request.user.profile
+    messageRequests = profile.messages.all()
+    unreadCount = messageRequests.filter(is_read=False).count()
+
+    context = {
+        'messageRequests': messageRequests,
+        'unreadCount': unreadCount
+    }
+    return render(request, 'users/inbox.html', context)
+
+
+'''
+
+- Create url 
+'''
+path('inbox/', views.inbox, name='inbox'),
+'''
+
+- render it from the navbar.html 
+
+- Create Message template 
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+<!-- Main Section -->
+<main class="messagePage my-xl">
+  <div class="content-box">
+    <div class="message">
+      <a class="backButton" href="{% url 'inbox' %}"><i class='bx bx-chevron-left'></i></a>
+      <h2 class="message__subject">{{message.subject}}</h4>
+        <a href="profile.html" class="message__author">{{message.name}}</a>
+        <p class="message__date">{{message.created}}</p>
+        <div class="message__body">{{message.body|linebreaksbr}}</div>
+    </div>
+  </div>
+</main>
+{% endblock content %}
+'''
+
+- create views 
+
+'''
+@login_required(login_url='login')
+def viewMessage(request, pk):
+    profile = request.user.profile
+    message = profile.messages.get(id=pk)
+     
+
+    if message.is_read == False:
+        message.is_read = True
+        message.save()
+
+    context = {
+       'message': message
+    }
+    return render(request, 'users/message.html', context)
+
+'''
+
+- Create urls 
+
+'''
+    path('message/<str:pk>/', views.viewMessage, name='message'),
+'''
+
+- Send message input template form : message_form.html
+
+'''
+{% extends 'main.html' %}
+
+{% block content %}
+
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <a class="backButton" href="{% url 'user-profile' recipient.id %}"><i class='bx bx-chevron-left'></i></a>
+            <br>
+
+            <form class="form" method="POST">
+
+                {% csrf_token %}
+
+                {% if request.user.is_authenticated == False %}
+                <div class="form__field">
+                    <label for="formInput#text">{{form.name.label}}</label>
+                    {{form.name}}
+                </div>
+
+                <div class="form__field">
+                    <label for="formInput#text">{{form.email.label}}</label>
+                    {{form.email}}
+                </div>
+                {% endif %}
+
+                <div class="form__field">
+                    <label for="formInput#text">{{form.subject.label}}</label>
+                    {{form.subject}}
+                </div>
+
+                <div class="form__field">
+                    <label for="formInput#text">{{form.body.label}}</label>
+                    {{form.body}}
+                </div>
+                
+                
+
+                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</main>
+
+{% endblock content %}
+
+'''
+
+- Create createMessage view 
+'''
+
+def createMessage(request, pk):
+    recipient = Profile.objects.get(id=pk)
+    form = MessageForm()
+
+    try:
+        sender = request.user.profile 
+
+    except:
+        sender = None 
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = sender 
+            message.recipient = recipient
+
+            if sender:
+                message.name = sender.name 
+                message.email = sender.email
+            
+            message.save()
+
+            messages.success(request, 'Your message was successfully sent!')
+            return redirect('user-profile', pk=recipient.id)
+
+    context = {
+        'recipient': recipient,
+        'form': form
+    }
+    return render(request, 'users/message_form.html', context)
+'''
+
+-  Create url 
+
+'''
+path('create-message/<str:pk>/', views.createMessage, name='create-message'),
+'''
+
+-Link the url from user-profile
+
+- Create a model form for message inside the forms.py 
+
+'''
+class MessageForm(ModelForm):
+    class Meta:
+        model = Message
+        fields = ['name', 'email', 'subject', 'body']
+
+    def __init__(self, *args, **kwargs):
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class':'input'})
+'''
+
+36/ Sending emails 
+
+- To send email it has to come from some kind of email provider 
+
+Inside the settings 
+
+'''
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "fsfd@gmail.com"
+EMAIL_HOST_PASSWORD = "pass"
+
+'''
+
+- Trigger sending email inside the signals 
+
+'''
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+# @receiver(post_save, sender=Profile)
+def createProfile(sender, instance, created, **kwargs):
+    print("Profile signal triggered")
+    if created:
+        user = instance
+        profile = Profile.objects.create(
+            user=user,
+            username=user.username,
+            email=user.email,
+            name=user.first_name,
+        )
+
+        subject = 'Welcome to RyuDevs!'
+        message = 'We are glad you are here'
+
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [profile.email],
+            fail_silently=False
+        )
+'''
+
+- We need to change the settings in gmail to less secure mode 
+
+- Instead of having to use our own email password we can use app password provided by email which can be used to protect ourselves
+
+37/ Password reset 
+
+- Go to root directory urls.py 
+
+# 1 - User submits email for reset 
+# 2 - Email sent message 
+# 3 - Email with link and reset instructions
+# 4 - Password successfully reset message 
+
+
+'''
+from django.contrib import admin
+from django.urls import path, include
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path('', include('users.urls')),
+    path('projects/', include('projects.urls')),
+
+    path('reset_password/', auth_views.PasswordResetView.as_view(template_name="reset_password.html"), name="reset_password"),
+    path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="reset_password_sent.html"), name="password_reset_done"),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="reset.html"), name="password_reset_confirm"),
+    path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="reset_password_complete.html"), name="password_reset_complete"),
+
+]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+
+'''
+
+- Inside login_register.html 
+'''
+<a href="{% url 'reset_password' %}">Forgot Password?</a>
+'''
+
+- To customize the template for password reset, inside the root directory templates create a new file reset_password.html 
+
+
+'''
+
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+
+    input[type='text'],
+    input[type='email'],
+    input[type='password']{
+        min-width: 24rem;
+        width: 100%;
+        padding: 1.2rem 1.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid var(--color-light);
+        transition: all 0.3s ease-in-out;
+        background-color: var(--color-bg);
+    }
+
+    input[type='text']:focus,
+    input[type='email']:focus,
+    input[type='password']:focus,
+    input[type='text']:active,
+    input[type='email']:active,
+    input[type='password']:active{
+        outline: none;
+        border: 2px solid var(--color-main);
+    }
+
+
+</style>
+
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            
+            <h3>Password reset</h3>
+
+            <p>Forgotten your password? Enter your email address below, and we’ll email instructions for setting a new one.</p>
+
+            <br>
+
+            <form class="form" method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</main>
+
+
+{% endblock content %}
+'''
+
+- Create another template for sent messsage 
+
+'''
+
+{% extends 'main.html' %}
+
+{% block content %}
+
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            
+            <h3>Password reset sent</h3>
+
+            <p>We’ve emailed you instructions for setting your password, if an account exists with the email you entered. You should receive them shortly.</p>
+            <br>
+            <p>If you don’t receive an email, please make sure you’ve entered the address you registered with, and check your spam folder.</p>
+
+        
+        </div>
+    </div>
+</main>
+
+
+{% endblock content %}
+'''
+
+- create reset.html
+
+'''
+
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+
+    input[type='text'],
+    input[type='email'],
+    input[type='password']{
+        min-width: 24rem;
+        width: 100%;
+        padding: 1.2rem 1.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid var(--color-light);
+        transition: all 0.3s ease-in-out;
+        background-color: var(--color-bg);
+    }
+
+    input[type='text']:focus,
+    input[type='email']:focus,
+    input[type='password']:focus,
+    input[type='text']:active,
+    input[type='email']:active,
+    input[type='password']:active{
+        outline: none;
+        border: 2px solid var(--color-main);
+    }
+
+
+</style>
+
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            
+            <h3>Enter new password</h3>
+
+            <p>Please enter your new password twice so we can verify you typed it in correctly.</p>
+
+            <br>
+
+            <form class="form" method="POST">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+</main>
+
+
+{% endblock content %}
+'''
+
+- Create reset_password_complete.html 
+'''
+
+{% extends 'main.html' %}
+
+{% block content %}
+
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            
+            <h3>Password reset complete</h3>
+
+            <p>Your password has been set. You may go ahead and log in now.</p>
+            <br>
+            <a href="{% url 'login' %}">Login</a>
+
+        
+        </div>
+    </div>
+</main>
+
+
+{% endblock content %}
+'''
+
+38/ Building up API - Setting up a simple API
+
+i/  Building API without djangorestframework
+
+- Create a folder called api inside root folder and create entire api of project inside it 
+
+We need init method to make a python module 
+    - __init__.py 
+    - urls.py 
+    - views.py 
+    -serializers.py 
+
+- inside views.py 
+
+'''
+from django.http import JsonResponse 
+
+
+def getRoutes(request):
+    routes = [ 
+        {'GET': '/api/projects'},
+        {'GET': '/api/projects/id'},
+        {'GET': '/api/projects/id/vote'},
+
+        # to get tokens for user to login users 
+        {'POST': '/api/user/token'},
+        {'POST': '/api/user/token/refresh'}
+    ]
+
+    return JsonResponse(routes, safe=False)
+'''
+
+- inside urls 
+'''
+from django.urls import path  
+from . import views 
+
+urlpatterns = [ 
+    path('', views.getRoutes),
+]
+'''
+
+- We need to let django know about the urls of api , go inside ryudevs project folder and inside urls 
+'''
+path('apt/', include('api.urls')),
+'''
+
+http://127.0.0.1:8000/api/
+
+ii/ Django REST framework and serializers 
+
+- it is a toolkit built on top of django and it really enhances in building the apis in django 
+
+$ pip install djangorestframework
+
+- Add in the settings INSTALLED_APPS
+
+[
+    'rest_framework',
+]
+
+https://www.django-rest-framework.org/tutorial/2-requests-and-responses/
+
+- inside views 
+
+'''
+from django.http import JsonResponse 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+
+@api_view(['GET'])
+def getRoutes(request):
+    routes = [ 
+        {'GET': '/api/projects'},
+        {'GET': '/api/projects/id'},
+        {'GET': '/api/projects/id/vote'},
+
+        # to get tokens for user to login users 
+        {'POST': '/api/user/token'},
+        {'POST': '/api/user/token/refresh'}
+    ]
+
+    return Response(routes)
+    '''
+
+- We want get data from our database and then return them back as json data, since we are going to return list of python objects we need to use serialization (process of converting python objects to json objects )
+
+inside ithe serializers.py 
+
+'''
+from rest_framework import serializers 
+from projects.models import Project 
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+'''
+
+- to use this serializer import inside the views 
+'''
+
+@api_view(['GET'])
+def getProjects(request):
+    projects = Project.objects.all()
+    serializer = ProjectSerializer(projects, many=True)
+
+    return Response(serializer.data)
+'''
+
+- Create a url path 
+'''
+path('projects/', views.getProjects)
+
+'''
+
+http://127.0.0.1:8000/api/projects/
+
+- serialize single object, in the above we only get the owner object or id and also the tag id so we cannot apply owner.id or like that so we are going to fix that 
+
+create another view 
+
+'''
+@api_view(['GET'])
+def getProjects(request, pk):
+    project = Project.objects.get(id=pk)
+    serializer = ProjectSerializer(project, many=False)
+
+    return Response(serializer.data)
+
+
+'''
+
+- urls , make it more restful by specifying the route as below instead of project/
+
+'''
+path('projects/<str:pk>/', views.getProject),
+'''
+
+http://127.0.0.1:8000/api/projects/c903deea-f743-4365-bbc7-c24af327e3b1/
+
+
+iii/ Nested seriralizer and serializer method fields..eg. we want to get the tag objects, instead or just ids so that we can use nested loops to access its fields
+
+inside serializers.py 
+
+'''
+from rest_framework import serializers 
+from projects.models import Project, Tag 
+from users.models import Profile
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    owner = ProfileSerializer(many=False)
+    tags = TagSerializer(many=True)
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+'''
+
+- Since review is a child attribute there is no way to access its field so we want to get the reviews 
+
+'''
+from rest_framework import serializers 
+from projects.models import Project, Tag, Review 
+from users.models import Profile
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    owner = ProfileSerializer(many=False)
+    tags = TagSerializer(many=True)
+    reviews = serializers.SerializerMethodField()
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+    def get_reviews(self, obj):
+        reviews = obj.review_set.all()
+        serializer = ReviewSerializer(reviews, many=True)
+
+        return serializer.data 
+'''
+
+iv/ Setting up Postman : Authentication with JSON web tokens 
+
+How authentication works by default in django: It is done by session based authentication. On login django creates a session id in the database where we have an entire database table for session ids 
+When we restrict certain users, django will check the ids and make sure that the user is either allowed or restricted 
+
+- For APIs we will user jwt because it might happen that our frontend and backends are hosted on completely different servers so we might need a tokent to pass along the two applications
+
+- jwt is an encrypted piece of info about our user 
+
+- Using simplejwt > https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+
+$ pip install djangorestframework-simplejwt
+
+- in settings.py 
+
+'''
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+'''
+
+- Inside the urls 
+
+'''
+
+from django.urls import path  
+from . import views 
+
+from rest_framework_simplejwt.views import ( 
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+
+urlpatterns = [ 
+    path('users/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    path('', views.getRoutes),
+    path('projects/', views.getProjects),
+    path('projects/<str:pk>/', views.getProject),
+]
+
+'''
+
+
+- Go to postman and do a new request : http://127.0.0.1:8000/api/users/token/
+
+Body:raw:JSON:
+
+{
+    "username": "fdgs",
+    "password": "jlj"
+}
+
+- Let's restrict projects or pages. Inside the api view 
+
+'''
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getProjects(request):
+    projects = Project.objects.all()
+    serializer = ProjectSerializer(projects, many=True)
+
+    return Response(serializer.data)
+'''
+
+Try to access http://127.0.0.1:8000/api/projects/
+
+Or in postman: {{URL}}/api/projects/
+
+- provide token value inside the headers
+
+Authorization, Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjcxODgyMTE1LCJpYXQiOjE2NzE4ODE4MTUsImp0aSI6ImZlZjU1NjEzMDU3YzRjZmY4Y2E3MTIyYjZiYmYyOGM2IiwidXNlcl9pZCI6MX0.X6cPYWWGEMEXU2_00_Kg5ntzMtyh39f5tckJ8nzVMYw
+
+
+- To customize tokens, inside the settings.py 
+
+'''
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+
+'''
+
+v/ Sending POST requests 
+
+- We will work with review model and allow user to send a vote 
+in views 
+
+'''
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def projectVote(request, pk):
+    project = Project.objects.get(id=pk)
+    user = request.user.profile 
+    data = request.data 
+
+    review, created = Review.objects.get_or_create( #check if already exists, get if exists, create if doesn't exist
+        owner = user,
+        project = project,
+    )
+
+    review.value = data['value']
+    review.save()
+    project.getVoteCount
+
+
+    print('DATA', data)
+
+    serializer = ProjectSerializer(project, many=False)
+    return Response(serializer.data)
+
+
+'''
+
+- Create an endpoint : 
+
+'''
+path('projects/<str:pk>/vote/', views.projectVote),
+'''
+
+Try to POST data at : {{URL}}/api/projects/c903deea-f743-4365-bbc7-c24af327e3b1/vote/
+{
+    "value": "up"
+}
+
+Headers: Authenticaiton, Bearer ldsfdsfsd'f
+
+v/ Getting data form the Frontend & CORS 
+
+- Create a separate folder called frontend outside ryudevs folder 
+
+- Create projects-list.html , 
+
+'''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="main.css">
+    
+</head>
+<body>
+
+    
+    <section id="projects--wrapper">
+
+    </section>
+</body>
+<script src="main.js"></script>
+</html>
+'''
+
+- main.js, 
+'''
+
+let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
+
+let getProjects = () => {
+    fetch(projectsUrl)
+    .then(response => response.json())
+    .then(data => {
+        // console.log(data)
+        buildProjects(data)
+    })
+}
+
+let buildProjects = (projects) => {
+    let projectsWrapper = document.getElementById('projects--wrapper')
+    
+    for (let i = 0; projects.length > i; i++) {
+        let project = projects[i]
+        
+        let projectCard = `
+            <div class="project--card">
+                <img src="http://127.0.0.1:8000${project.featured_image}" />
+
+                <div>
+                    <div class="card--header">
+                        <h3>${project.title}</h3>
+                        <strong class="vote--option">&#43;</strong>
+                        <strong class="vote--option">&#8722;</strong>
+                    </div>
+
+                    <i>${project.vote_ratio}% Positive feedback </i>
+                    <p>${project.description.substring(0,150)}</p>
+                </div>
+            </div>
+        `
+        projectsWrapper.innerHTML += projectCard
+    }
+}
+
+getProjects()
+
+'''
+
+
+- main.css 
+
+'''
+body{
+    background-color: #f8fafb;
+    margin: 0;
+}
+
+img{
+    width: 100%;
+}
+
+#projects--wrapper{
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 2em;
+    border: 1px solid #eaeaeb;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.project--card{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 2em;
+    margin-top: 2em;
+    padding: 1em;
+    align-items: center;
+}
+
+.card--header{
+    display: flex;
+    align-items: center;
+    gap: 2em;
+}
+
+.project--card p{
+    color: #737373;
+}
+
+.vote--option{
+    font-size: 24px;
+    color: #737373;
+    cursor: pointer;
+}
+
+.vote--option:hover{
+    color: #000;
+}
+
+'''
+
+
+* our request gets blocked by the django server because it doesn't know from where the request is coming from 
+
+- Go back to django project and install CORS : cross origin resource sharing 
+
+$ python -m pip install django-cors-
+
+Add it to the settings 
+
+'''
+"corsheaders",
+
+'''
+
+Add following to middleware 
+
+'''
+
+"corsheaders.middleware.CorsMiddleware",
+
+'''
+
+'''
+CORS_ALLOW_ALL_ORIGINS = True
+'''
+
+vi/ Sending data from the frontend 
+
+- We will send data using javascript using event listener 
+main.js 
+
+'''
+
+
+let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
+
+let getProjects = () => {
+    fetch(projectsUrl)
+    .then(response => response.json())
+    .then(data => {
+        // console.log(data)
+        buildProjects(data)
+    })
+}
+
+let buildProjects = (projects) => {
+    let projectsWrapper = document.getElementById('projects--wrapper')
+    projectsWrapper.innerHTML = ''
+
+    for (let i = 0; projects.length > i; i++) {
+        let project = projects[i]
+        
+        let projectCard = `
+            <div class="project--card">
+                <img src="http://127.0.0.1:8000${project.featured_image}" />
+
+                <div>
+                    <div class="card--header">
+                        <h3>${project.title}</h3>
+                        <strong class="vote--option" data-vote="up" data-project="${project.id}">&#43;</strong>
+                        <strong class="vote--option" data-vote="down" data-project="${project.id}">&#8722;</strong>
+                    </div>
+
+                    <i>${project.vote_ratio}% Positive feedback </i>
+                    <p>${project.description.substring(0,150)}</p>
+                </div>
+            </div>
+        `
+        projectsWrapper.innerHTML += projectCard
+    }
+
+    // Add an event listener 
+    addVoteEvents()
+}
+
+let addVoteEvents = () => {
+    let voteBtns = document.getElementsByClassName('vote--option')
+    
+    for (let i=0; voteBtns.length > i; i++){
+        voteBtns[i].addEventListener('click', (e) => {
+            let token = localStorage.getItem('token')
+            console.log(token)
+            
+            let vote = e.target.dataset.vote
+            let project = e.target.dataset.project
+            
+
+            fetch(`http://127.0.0.1:8000/api/projects/${project}/vote/`, {
+                method: 'POST', 
+                headers:{
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({'value': vote})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success: ', data)
+                getProjects()
+            })
+
+        })
+    }
+}
+
+getProjects()
+
+
+
+'''
+
+vii/ Storing the JSON web tokens in local storage : on login tokens should be stored in localstorage dynamilally and also a logout button to delete the token 
+
+- project-list.html 
+'''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="main.css">
+    
+</head>
+<body>
+
+    <section>
+        <a href="" id="logout-btn">Logout</a>
+        <a href="login.html" id="login-btn">Login</a>
+    </section>
+    
+    <section id="projects--wrapper">
+
+    </section>
+</body>
+<script src="main.js"></script>
+</html>
+'''
+
+
+- create login.html 
+'''
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+
+<body>
+    <div id="form-wrapper">
+        <h1>Login</h1>
+
+        <hr>
+
+        <form id="login-form">
+            <label>Username: </label>
+            <input type="text" name="username">
+
+            <label>Password: </label>
+            <input type="password" name="password">
+
+            <input type="submit" value="Login"/>
+        </form>
+    </div>
+</body>
+
+<script src="login.js"></script>
+</html>
+'''
+
+- main.css 
+
+'''
+body{
+    background-color: #f8fafb;
+    margin: 0;
+}
+
+img{
+    width: 100%;
+}
+
+#projects--wrapper{
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 2em;
+    border: 1px solid #eaeaeb;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.project--card{
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 2em;
+    margin-top: 2em;
+    padding: 1em;
+    align-items: center;
+}
+
+.card--header{
+    display: flex;
+    align-items: center;
+    gap: 2em;
+}
+
+.project--card p{
+    color: #737373;
+}
+
+.vote--option{
+    font-size: 24px;
+    color: #737373;
+    cursor: pointer;
+}
+
+.vote--option:hover{
+    color: #000;
+}
+
+#form-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 2em;
+    border: 1px solid #eaeaeb;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 2em;
+}
+
+
+
+
+
+
+
+'''
+
+
+- login.js 
+
+
+'''
+
+let form = document.getElementById('login-form')
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault() // to prevent the form from refreshing so that we can perform other actions 
+
+    let formData = {
+        'username': form.username.value,
+        'password': form.password.value
+    }
+
+    fetch('http://127.0.0.1:8000/api/users/token/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('DATA:', data.access)
+        if(data.access){
+            localStorage.setItem('token', data.access)
+            window.location = 'file:///E:/Files/Others/UdemyCourses/Python%20Django%20-%20Complete%20Course/Project/frontend/projects-list.html'
+        } else {
+            alert('Username or password incorrect!')
+        }
+    })
+    
+})
+'''
+
+
+- main.js 
+
+'''
+
+let loginBtn = document.getElementById('login-btn')
+let logoutBtn = document.getElementById('logout-btn')
+
+let token = localStorage.getItem('token')
+
+if (token) {
+    loginBtn.remove()
+} else {
+    logoutBtn.remove()
+}
+
+logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    localStorage.removeItem('token')
+    window.location = 'file:///E:/Files/Others/UdemyCourses/Python%20Django%20-%20Complete%20Course/Project/frontend/login.html'
+})
+
+
+let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
+
+let getProjects = () => {
+    fetch(projectsUrl)
+    .then(response => response.json())
+    .then(data => {
+        // console.log(data)
+        buildProjects(data)
+    })
+}
+
+let buildProjects = (projects) => {
+    let projectsWrapper = document.getElementById('projects--wrapper')
+    projectsWrapper.innerHTML = ''
+
+    for (let i = 0; projects.length > i; i++) {
+        let project = projects[i]
+        
+        let projectCard = `
+            <div class="project--card">
+                <img src="http://127.0.0.1:8000${project.featured_image}" />
+
+                <div>
+                    <div class="card--header">
+                        <h3>${project.title}</h3>
+                        <strong class="vote--option" data-vote="up" data-project="${project.id}">&#43;</strong>
+                        <strong class="vote--option" data-vote="down" data-project="${project.id}">&#8722;</strong>
+                    </div>
+
+                    <i>${project.vote_ratio}% Positive feedback </i>
+                    <p>${project.description.substring(0,150)}</p>
+                </div>
+            </div>
+        `
+        projectsWrapper.innerHTML += projectCard
+    }
+
+    // Add an event listener 
+    addVoteEvents()
+}
+
+let addVoteEvents = () => {
+    let voteBtns = document.getElementsByClassName('vote--option')
+    
+    for (let i=0; voteBtns.length > i; i++){
+        voteBtns[i].addEventListener('click', (e) => {
+            let token = localStorage.getItem('token')
+            console.log(token)
+            
+            let vote = e.target.dataset.vote
+            let project = e.target.dataset.project
+            
+
+            fetch(`http://127.0.0.1:8000/api/projects/${project}/vote/`, {
+                method: 'POST', 
+                headers:{
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({'value': vote})
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success: ', data)
+                getProjects()
+            })
+
+        })
+    }
+}
+
+getProjects()
+
+
+'''
+
+
+
+39/ Connecting a postgres database 
+
+- Download postgresql 
+
+- Download pgadmin
+
+- open pgadmin > (use the pw that we gave when downloading pgadmin--ugh) create new server (TUTS)> create database(ryudevs)
+
+- Inside settings create a connection:
+
+'''
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "ryudevs",
+        'USER': "postgres",
+        'PASSWORD': "postgres-pw",
+        'HOST': "localhost",
+        'PORT': '5432',
+    }
+}
+
+
+'''
+
+- migrate : 
+
+$ python manage.py migrate  
+
+$ python manage.py 
+
+- View the data : TUTS>Databases:ryudevs>schemas>public>tables>righ click auth_user and select view >allrows
+
+- Creating user will also create profile since we used signal to create a profile users
+
+- Creating postgres database in aws RDS, to store our tables, to store images in AWS S3 buckets, add bucket policy to make images public to access, Create IAM (generate IAM user) for accesess managements of differents parts or services of aws  
+
+- Django-storages and boto3
+
+
+*** Connected to supabase free postgres database 
+
+** Created another server in pgadmin with the same configuration in supabse 
+
+
+
+40/ Deployment on heroku 
+
+$ python -m pip install gunicorn
+
+Procfile 
+
+'''
+web: gunicorn ryudevs.wsgi --log-file -
+'''
+
+
+settings.py 
+
+'''
+
+# if the application is in production mode 
+if os.getcwd() == '/app':
+    DEBUG = False
+
+
+    ''''
+
+$ pip freeze > requirements.txt 
+
+- runtime.txt 
+
+'''
+python-3.9.5
+'''
+
+.gitignore 
+
+'''
+env/
+
+
+'''
+
+$ pip install whitenoise 
+
+configure inside settings 
+
+
+- Push to github  : make it private 
+
+- Configure from heroku 
+
+
+41/ Securing variables inside environment variables 
+
+- search for environment variables 
+
+- Inside User variables add the variables 
+
+- Inside settings , 
+
+'''
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+'''
+
+
+
+42/ Storing image files in cloudinary for free 
+
+- Signup for free https://cloudinary.com/ :wcodegmai
+
+- https://pypi.org/project/django-cloudinary-storage/
+$ pip install django-cloudinary-
+
+- Inside settings INSTALLED_APPS
+
+'''
+
+import cloudinary_storage
+
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    
+    'projects.apps.ProjectsConfig',
+    'users.apps.UsersConfig',
+
+    'rest_framework',
+    "corsheaders",
+    'cloudinary_storage',
+]
+
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUD_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUD_API_SECRET')
+}
+
+
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+'''
+
+
+43/ Deploying to Render 
+
+- Configure Django Project
+
+$ pip install python-dotenv
+
+    requirements.txt : 
+    python-dotenv==0.21.0
+    psycopg2-binary==2.9.5
+    dj-database-url==1.2.0
+
+- settings.py 
+
+'''
+
+# core/settings.py
+
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
+
+
+# core/settings.py
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
+
+
+
+'''
+
+Database :
+
+$ pip install dj-database-url
+  $ pip install gunicorn
+
+
+settings
+'''
+
+import os
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.parse(os.environ.get('DATABASE_URL'), conn_max_age=600),
+}
+'''
+
+- Create a build.sh file in the project root with the following contents:
+'''
+#!/usr/bin/env bash
+
+set -o errexit  # exit on error
+
+pip install -r requirements.txt
+
+python manage.py collectstatic --no-input
+python manage.py migrate
+'''
+
+- Database
+
+From the Render dashboard, click "New" at the top right of the screen and then "PostgreSQL". Then, create a PostgreSQL instance with the following parameters:
+
+    Name: Custom name
+    Database: Leave empty
+    User: Leave empty
+    Region: The region closest to you
+    PostgreSQL Version: 15
+    Datadog API Key: Leave empty
+    Plan Type: Plan that suits your needs
+
+
+- Web Service
+
+Moving along, let's create a web service.
+
+Once again click "New" at the top right of the screen, but this time select "Web Service".
+
+Connect your Render account to either your GitHub or GitLab account. Make sure to grant Render permissions to the repositories you'd like to deploy. Once connected select your repository.
+
+Enter the following details:
+
+    Name: Custom name
+    Region: The same region as your database
+    Branch: Your main branch (e.g., master/main)
+    Root directory: Leave empty
+    Environment: Python 3
+    Build command: sh build.sh
+    Start command gunicorn ryudevs.wsgi:application
+    Plan Type: Plan that suits your needs
+
+Open the "Advanced" dropdown and add the following environmental variables:
+
+    PYTHON_VERSION: 3.9.9
+    SECRET_KEY: Click "Generate"
+    DEBUG: 1
+    ALLOWED_HOSTS: *
+    DATABASE_URL: <your_internal_database_url>
+
+
+- Static Files
+Start by adding the following two packages to requirements.txt:
+
+whitenoise==6.2.0
+Brotli==1.0.9
+
+- Next, add WhiteNoise's middleware to the MIDDLEWARE list in settings.py. It should be placed above all other middleware apart from Django's SecurityMiddleware:
+
+# core/settings.py
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # ...
+]
+
+
+- Lastly, scroll down to the bottom of settings.py and add:
+
+# core/settings.py
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+- Django Admin Access
+
+There are two ways to create a superuser:
+
+    SSH into the server and run the createsuperuser command.
+    Create a Django command that creates the superuser and add it to build.sh.
+
+
+For the second method: 
+
+As of Django 3.0 you can use default createsuperuser --noinput command and set all required fields (including password) as environment variables DJANGO_SUPERUSER_PASSWORD, DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL for example. --noinput flag is required.
+
+
+- Add the createsuperuser command to the end of build.sh like so:
+
+#!/usr/bin/env bash
+
+set -o errexit  # exit on error
+
+pip install -r requirements.txt
+
+python manage.py collectstatic --no-input
+python manage.py migrate
+python manage.py createsuperuser --no-input # new
+
+
+
+ 44/
